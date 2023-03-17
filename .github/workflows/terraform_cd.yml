@@ -1,0 +1,63 @@
+
+name: 'Terragrunt_CD'
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+permissions:
+    id-token: write
+    issues: write
+    pull-requests: write
+    contents: write
+    
+defaults:
+  run:
+    shell: bash
+    working-directory: "./hub-rg"
+    
+jobs: 
+  Terraform:
+    name: 'Terraform deployment'
+    runs-on: self-hosted
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Azure Login
+      run: |
+          az login -u ${{ secrets.AZ_USERNAME }} -p ${{ secrets.AZ_PASSWORD }}
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # Run Terraform init
+    - name: Terraform Init
+      id: init
+      run: terraform init
+         
+    - name: Terraform validate
+      id: validate
+      run: terraform validate
+
+    - name: Terraform plan
+      id: plan
+      run: terraform plan
+      
+
+#     - name: Terraform apply
+#       id: apply
+#       run: terraform apply --auto-approve
+      
+
+#     - name: Terraform destroy
+#       id: destroy
+#       env:
+#         ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+#         ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+#         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+#         ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+#       run: terraform destroy --auto-approve
