@@ -1,9 +1,11 @@
 module "vnet" {
   source                     = ".//vnet"
   resource_group_name        = "hub-rg"
+  create_resource_group = true
+  location = "eastus"
   dns_server_ip              = ["8.8.8.8"]
   vnet_address_space         = ["10.0.0.0/16"]
-  prefix                     = "non-prod"
+  prefix                     = "hub"
   firewall_service_endpoints = null
   gateway_service_endpoints  = null
   tags = {
